@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
                 downstream.onComplete();
             }
         })
+        .subscribeOnNewThread()
         .map(new Function<String, Boolean>() {
             @Override
             public Boolean apply(String s) throws Exception {

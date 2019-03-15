@@ -45,6 +45,26 @@ public abstract class Upstream<T> {
         };
     }
 
+    /**
+     * 改变上游所在的线程
+     * @return
+     */
+    public Upstream<T> subscribeOnNewThread(){
+        return new Upstream<T>() {
+            @Override
+            public void subscribe(final Downstream<T> downFlow) {
+
+                new Thread(){
+                    @Override
+                    public void run() {
+                        Upstream.this.subscribe(downFlow);
+                    }
+                }.start();
+
+            }
+        };
+    }
+
     public interface UpstreamSource<T>{
         void call(Downstream<T> downstream);
     }
