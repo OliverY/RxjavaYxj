@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.yxj.rxjavayxj.rxjava.Downstream;
+import com.yxj.rxjavayxj.rxjava.Function;
 import com.yxj.rxjavayxj.rxjava.Upstream;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,13 +33,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void call(Downstream<String> downstream) {
                 downstream.onNext("hello world");
+                downstream.onNext("good boy");
+                downstream.onNext("see u");
                 downstream.onComplete();
             }
         })
-        .subscribe(new Downstream<String>() {
+        .map(new Function<String, Boolean>() {
             @Override
-            public void onNext(String s) {
-                Log.e(TAG,s);
+            public Boolean apply(String s) throws Exception {
+                return s.length()>6;
+            }
+        })
+        .subscribe(new Downstream<Boolean>() {
+            @Override
+            public void onNext(Boolean aBoolean) {
+                Log.e(TAG,"result:"+aBoolean);
             }
 
             @Override

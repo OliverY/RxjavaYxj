@@ -19,6 +19,32 @@ public abstract class Upstream<T> {
         };
     }
 
+    public <R> Upstream<R> map(final Function<T,R> function){
+
+        return new Upstream<R>(){
+            @Override
+            public void subscribe(final Downstream<R> downFlow) {
+
+                Upstream.this.subscribe(new Downstream<T>() {
+                    @Override
+                    public void onNext(T t) {
+                        try {
+                            R r = function.apply(t);
+                            downFlow.onNext(r);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+            }
+        };
+    }
+
     public interface UpstreamSource<T>{
         void call(Downstream<T> downstream);
     }
