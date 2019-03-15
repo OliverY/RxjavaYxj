@@ -1,5 +1,7 @@
 package com.yxj.rxjavayxj.rxjava;
 
+import android.os.Handler;
+
 /**
  * Author:  Yxj
  * Time:    2019/3/15 上午9:50
@@ -65,8 +67,70 @@ public abstract class Upstream<T> {
         };
     }
 
+    /**
+     * 改变下游所在的线程，切换到主线程
+     * @return
+     */
+    public Upstream<T> observeOnMainThread(){
+        return new Upstream<T>() {
+            @Override
+            public void subscribe(final Downstream<T> downFlow) {
+
+                Upstream.this.subscribe(new Downstream<T>() {
+                    @Override
+                    public void onNext(final T t) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                downFlow.onNext(t);
+                            }
+                        });
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+            }
+        };
+    }
+
+    /**
+     * 改变下游所在的线程，在新的线程
+     * @return
+     */
+    public Upstream<T> observeOnNewThread(){
+        return new Upstream<T>() {
+            @Override
+            public void subscribe(final Downstream<T> downFlow) {
+
+                Upstream.this.subscribe(new Downstream<T>() {
+                    @Override
+                    public void onNext(final T t) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                downFlow.onNext(t);
+                            }
+                        });
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+            }
+        };
+    }
+
     public interface UpstreamSource<T>{
         void call(Downstream<T> downstream);
     }
+
+    Handler handler = new Handler();
 
 }
