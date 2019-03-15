@@ -6,9 +6,9 @@ import android.os.Handler;
  * Author:  Yxj
  * Time:    2019/3/15 上午9:50
  * -----------------------------------------
- * Description: 上游
+ * Description: 上游 相当于Observable
  */
-public abstract class Upstream<T> {
+public abstract class Upstream<T> implements UpstreamSource<T>{
 
     public abstract void subscribe(Downstream<T> downstream);
 
@@ -16,18 +16,18 @@ public abstract class Upstream<T> {
         return new Upstream<T>(){
             @Override
             public void subscribe(Downstream<T> downFlow) {
-                source.call(downFlow);
+                source.subscribe(downFlow);
             }
         };
     }
 
     public <R> Upstream<R> map(final Function<T,R> function){
 
-        return new Upstream<R>(){
+        return new Upstream<R>(){// 创建了一个新的 上游
             @Override
             public void subscribe(final Downstream<R> downFlow) {
-
-                Upstream.this.subscribe(new Downstream<T>() {
+                // 原来的上游 subscribe 新的下游
+                Upstream.this.subscribe(new Downstream<T>() {// 创建了一个新的 下游
                     @Override
                     public void onNext(T t) {
                         try {
@@ -125,10 +125,6 @@ public abstract class Upstream<T> {
                 });
             }
         };
-    }
-
-    public interface UpstreamSource<T>{
-        void call(Downstream<T> downstream);
     }
 
     Handler handler = new Handler();
