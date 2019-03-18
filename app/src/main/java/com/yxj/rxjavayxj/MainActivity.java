@@ -211,6 +211,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * 模拟用Rxjava封装网络访问
+     */
     private void login() {
         String userName = "yxj";
         String password = "123456";
