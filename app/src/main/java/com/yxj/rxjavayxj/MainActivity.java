@@ -8,7 +8,6 @@ import android.view.View;
 import com.yxj.rxjavayxj.rxjava.Downstream;
 import com.yxj.rxjavayxj.rxjava.Function;
 import com.yxj.rxjavayxj.rxjava.Upstream;
-import com.yxj.rxjavayxj.rxjava.UpstreamSource;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -53,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void simple() {
-        Upstream.createUpstream(new UpstreamSource<String>() {
+        Upstream.createUpstream(new Upstream<String>() {
             @Override
             public void subscribe(Downstream<String> downstream) {
                 downstream.onNext("hello");
@@ -76,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
      * 模拟map操作符
      */
     private void map() {
-        Upstream.createUpstream(new UpstreamSource<String>() {
+        Upstream.createUpstream(new Upstream<String>() {
             @Override
             public void subscribe(Downstream<String> downstream) {
                 downstream.onNext("hello");
@@ -108,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
      * 模拟observeOn操作符
      */
     private void observe() {
-        Upstream.createUpstream(new UpstreamSource<String>() {
+        Upstream.createUpstream(new Upstream<String>() {
             @Override
             public void subscribe(Downstream<String> downstream) {
                 downstream.onNext("hello");
@@ -141,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
      * 模拟subscribeOn操作符
      */
     private void subscribe() {
-        Upstream.createUpstream(new UpstreamSource<String>() {
+        Upstream.createUpstream(new Upstream<String>() {
             @Override
             public void subscribe(Downstream<String> downstream) {
                 downstream.onNext("hello world");
@@ -176,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void compose() {
 
-        Upstream.createUpstream(new UpstreamSource<String>() {
+        Upstream.createUpstream(new Upstream<String>() {
             @Override
             public void subscribe(Downstream<String> downstream) {
                 downstream.onNext("hello world");

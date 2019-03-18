@@ -8,11 +8,11 @@ import android.os.Handler;
  * -----------------------------------------
  * Description: 上游 相当于Observable
  */
-public abstract class Upstream<T> implements UpstreamSource<T>{
+public abstract class Upstream<T>{
 
     public abstract void subscribe(Downstream<T> downstream);
 
-    public static <T> Upstream<T> createUpstream(final UpstreamSource<T> source){
+    public static <T> Upstream<T> createUpstream(final Upstream<T> source){
         return new Upstream<T>(){
             @Override
             public void subscribe(Downstream<T> downFlow) {
