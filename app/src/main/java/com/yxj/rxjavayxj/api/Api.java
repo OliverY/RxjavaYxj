@@ -1,4 +1,4 @@
-package com.yxj.rxjavayxj;
+package com.yxj.rxjavayxj.api;
 
 import android.database.Observable;
 
