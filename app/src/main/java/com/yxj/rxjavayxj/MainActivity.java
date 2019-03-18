@@ -8,6 +8,7 @@ import android.view.View;
 import com.yxj.rxjavayxj.rxjava.Downstream;
 import com.yxj.rxjavayxj.rxjava.Function;
 import com.yxj.rxjavayxj.rxjava.Upstream;
+import com.yxj.rxjavayxj.rxjava.UpstreamSource;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,14 +30,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void test() {
 
-        Upstream.createUpstream(new Upstream.UpstreamSource<String>() {
+        Upstream.createUpstream(new UpstreamSource<String>() {
             @Override
-            public void call(Downstream<String> downstream) {
+            public void subscribe(Downstream<String> downstream) {
                 downstream.onNext("hello world");
                 downstream.onNext("good boy");
                 downstream.onNext("see u");
                 downstream.onComplete();
             }
+
         })
         .subscribeOnNewThread() // 相当于 subscribeOn(Schedulers.newThread())
         .map(new Function<String, Boolean>() {
