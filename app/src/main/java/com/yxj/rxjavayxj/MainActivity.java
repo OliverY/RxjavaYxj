@@ -19,16 +19,162 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        findViewById(R.id.btn).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btn_simple).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                test();
+                simple();
+            }
+        });
+        findViewById(R.id.btn_map).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                map();
+            }
+        });
+        findViewById(R.id.btn_onobserve).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                observe();
+            }
+        });
+        findViewById(R.id.btn_onsubscribe).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                subscribe();
+            }
+        });
+        findViewById(R.id.btn_compose).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                compose();
             }
         });
 
     }
 
-    private void test() {
+    private void simple() {
+        Upstream.createUpstream(new UpstreamSource<String>() {
+            @Override
+            public void subscribe(Downstream<String> downstream) {
+                downstream.onNext("hello");
+            }
+        })
+        .subscribe(new Downstream<String>() {
+            @Override
+            public void onNext(String s) {
+                Log.e(TAG, s);
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+    }
+
+    /**
+     * 模拟map操作符
+     */
+    private void map() {
+        Upstream.createUpstream(new UpstreamSource<String>() {
+            @Override
+            public void subscribe(Downstream<String> downstream) {
+                downstream.onNext("hello");
+                downstream.onNext("world");
+                downstream.onNext("i love you");
+            }
+        })
+        .map(new Function<String, Boolean>() {
+            @Override
+            public Boolean apply(String s) throws Exception {
+                return s.length() > 5;
+            }
+        })
+        .subscribe(new Downstream<Boolean>() {
+            @Override
+            public void onNext(Boolean aBoolean) {
+                Log.e(TAG, "result:" + aBoolean);
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+
+    }
+
+    /**
+     * 模拟observeOn操作符
+     */
+    private void observe() {
+        Upstream.createUpstream(new UpstreamSource<String>() {
+            @Override
+            public void subscribe(Downstream<String> downstream) {
+                downstream.onNext("hello");
+                downstream.onNext("world");
+                downstream.onNext("i love you");
+            }
+        })
+        .map(new Function<String, Boolean>() {
+            @Override
+            public Boolean apply(String s) throws Exception {
+                return s.length() > 5;
+            }
+        })
+        .observeOnMainThread() // 相当于 observeOn(AndroidThread.mainThread())
+        .subscribe(new Downstream<Boolean>() {
+            @Override
+            public void onNext(Boolean aBoolean) {
+                Log.e(TAG, "result:" + aBoolean);
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+
+    }
+
+    /**
+     * 模拟subscribeOn操作符
+     */
+    private void subscribe() {
+        Upstream.createUpstream(new UpstreamSource<String>() {
+            @Override
+            public void subscribe(Downstream<String> downstream) {
+                downstream.onNext("hello world");
+                downstream.onNext("good boy");
+                downstream.onNext("see u");
+                downstream.onComplete();
+            }
+
+        })
+        .map(new Function<String, Boolean>() {
+            @Override
+            public Boolean apply(String s) throws Exception {
+                return s.length() > 6;
+            }
+        })
+        .observeOnMainThread() // 相当于 observeOn(AndroidThread.mainThread())
+        .subscribe(new Downstream<Boolean>() {
+            @Override
+            public void onNext(Boolean aBoolean) {
+                Log.e(TAG, "result:" + aBoolean);
+            }
+
+            @Override
+            public void onComplete() {
+                Log.e(TAG, "onComplete");
+            }
+        });
+    }
+
+    /**
+     * 模拟compose操作符
+     */
+    private void compose() {
 
         Upstream.createUpstream(new UpstreamSource<String>() {
             @Override
@@ -40,25 +186,23 @@ public class MainActivity extends AppCompatActivity {
             }
 
         })
-        .subscribeOnNewThread() // 相当于 subscribeOn(Schedulers.newThread())
         .map(new Function<String, Boolean>() {
             @Override
             public Boolean apply(String s) throws Exception {
-                return s.length()>6;
+                return s.length() > 6;
             }
         })
-        .observeOnMainThread() // 相当于 observeOn(AndroidThread.mainThread())
+        .compose()
         .subscribe(new Downstream<Boolean>() {
             @Override
             public void onNext(Boolean aBoolean) {
-                Log.e(TAG,"result:"+aBoolean);
+                Log.e(TAG, "result:" + aBoolean);
             }
 
             @Override
             public void onComplete() {
-                Log.e(TAG,"onComplete");
+                Log.e(TAG, "onComplete");
             }
         });
-
     }
 }

@@ -127,6 +127,14 @@ public abstract class Upstream<T> implements UpstreamSource<T>{
         };
     }
 
+    /**
+     * compose 连接上下游
+     * @return
+     */
+    public Upstream<T> compose(){
+        return Upstream.this.subscribeOnNewThread().observeOnMainThread();
+    }
+
     Handler handler = new Handler();
 
 }
