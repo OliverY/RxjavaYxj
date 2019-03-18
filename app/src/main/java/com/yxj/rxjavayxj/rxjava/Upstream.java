@@ -129,6 +129,8 @@ public abstract class Upstream<T>{
 
     /**
      * compose 连接上下游
+     *
+     * 这里固定写成了 上游切换至 新线程，下游切换至 主线程
      * @return
      */
     public Upstream<T> compose(){

@@ -48,6 +48,12 @@ public class MainActivity extends AppCompatActivity {
                 compose();
             }
         });
+        findViewById(R.id.btn_login).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                login();
+            }
+        });
 
     }
 
@@ -204,4 +210,23 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void login() {
+        String userName = "yxj";
+        String password = "123456";
+
+        Api.login(userName,password)
+                .subscribe(new Downstream<String>() {
+                    @Override
+                    public void onNext(String s) {
+                        Log.e(TAG,s);
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
 }
