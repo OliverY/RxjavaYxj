@@ -26,17 +26,13 @@ public class Rxtest {
                 .flatMap(new Function<LocationData, Upstream<LoginData>>() {
                     @Override
                     public Upstream<LoginData> apply(LocationData locationData) throws Exception {
-                        String unionId = locationData.unionId;
-                        Log.e(TAG,"获取到unionId="+unionId);
-                        return login("yxj","123456",unionId);
+                        return login("yxj","123456",locationData.unionId);
                     }
                 })
                 .flatMap(new Function<LoginData, Upstream<IMLoginData>>() {
                     @Override
                     public Upstream<IMLoginData> apply(LoginData loginData) throws Exception {
-                        String imToken = loginData.imToken;
-                        Log.e(TAG,"登录成功，获取到imToken="+imToken);
-                        return imLogin(imToken);
+                        return imLogin(loginData.imToken);
                     }
                 })
                 .subscribe(new Downstream<IMLoginData>() {
@@ -69,6 +65,7 @@ public class Rxtest {
                 try {
                     Thread.sleep(2000);
                     downstream.onNext(new LocationData("杭州", "100"));
+                    Log.e(TAG,"获取到unionId="+100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -94,6 +91,7 @@ public class Rxtest {
                     try {
                         Thread.sleep(2000);
                         downstream.onNext(new LoginData(true, "akdfajkfasfkjqfafkjwehfksajsf"));
+                        Log.e(TAG,"登录成功，获取到imToken="+"akdfajkfasfkjqfafkjwehfksajsf");
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -116,6 +114,7 @@ public class Rxtest {
                     try {
                         Thread.sleep(2000);
                         downstream.onNext(new IMLoginData(true));
+                        Log.e(TAG,"IM登录成功");
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
