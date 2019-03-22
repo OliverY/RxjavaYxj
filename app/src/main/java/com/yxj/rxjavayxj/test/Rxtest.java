@@ -64,8 +64,8 @@ public class Rxtest {
             public void subscribe(Downstream<LocationData> downstream) {
                 try {
                     Thread.sleep(2000);
-                    downstream.onNext(new LocationData("杭州", "100"));
                     Log.e(TAG,"获取到unionId="+100);
+                    downstream.onNext(new LocationData("杭州", "100"));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -90,8 +90,8 @@ public class Rxtest {
 
                     try {
                         Thread.sleep(2000);
-                        downstream.onNext(new LoginData(true, "akdfajkfasfkjqfafkjwehfksajsf"));
                         Log.e(TAG,"登录成功，获取到imToken="+"akdfajkfasfkjqfafkjwehfksajsf");
+                        downstream.onNext(new LoginData(true, "akdfajkfasfkjqfafkjwehfksajsf"));
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -114,7 +114,6 @@ public class Rxtest {
                     try {
                         Thread.sleep(2000);
                         downstream.onNext(new IMLoginData(true));
-                        Log.e(TAG,"IM登录成功");
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
