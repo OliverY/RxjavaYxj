@@ -36,7 +36,7 @@ public class Rxtest {
                     public Upstream<IMLoginData> apply(LoginData loginData) throws Exception {
                         String imToken = loginData.imToken;
                         Log.e(TAG,"登录成功，获取到imToken="+imToken);
-                        return imLogin(loginData.imToken);
+                        return imLogin(imToken);
                     }
                 })
                 .subscribe(new Downstream<IMLoginData>() {
@@ -68,10 +68,10 @@ public class Rxtest {
             public void subscribe(Downstream<LocationData> downstream) {
                 try {
                     Thread.sleep(2000);
+                    downstream.onNext(new LocationData("杭州", "100"));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                downstream.onNext(new LocationData("杭州", "100"));
             }
         });
     }
@@ -93,10 +93,10 @@ public class Rxtest {
 
                     try {
                         Thread.sleep(2000);
+                        downstream.onNext(new LoginData(true, "akdfajkfasfkjqfafkjwehfksajsf"));
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    downstream.onNext(new LoginData(true, "akdfajkfasfkjqfafkjwehfksajsf"));
                 }
             }
         });
@@ -115,10 +115,10 @@ public class Rxtest {
                 if(imToken.equals("akdfajkfasfkjqfafkjwehfksajsf")){
                     try {
                         Thread.sleep(2000);
+                        downstream.onNext(new IMLoginData(true));
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    downstream.onNext(new IMLoginData(true));
                 }
 
             }
