@@ -10,13 +10,38 @@ import android.os.Handler;
  */
 public abstract class Upstream<T>{
 
+    // 创建了一个新的东西，假如我有处理者，那我会怎样怎样
+
     public abstract void subscribe(Downstream<T> downstream);
 
     public static <T> Upstream<T> createUpstream(final Upstream<T> source){
-        return new Upstream<T>(){
+//        return source;
+        /*
+        这一步是创建一个事件源，其实创建的 上游 完全可以用上面的代码替代，效果是相同的。
+        但是为了和Rxjava的调用机制相同，这里内部重新创建了一个 上游，重写它的subscribe方法，内部让上一个 上游（外部 程序员定义的上游）与 下游产生关联（此时关联还并没有建立）
+        当上游调用 subscribe方法时，本次的 上游 与 下游产生关联
+         */
+//        return new Upstream<T>(){
+//            @Override
+//            public void subscribe(Downstream<T> downFlow) {
+//                source.subscribe(downFlow);
+//            }
+//        };
+
+        return new Upstream<T>() {
             @Override
-            public void subscribe(Downstream<T> downFlow) {
-                source.subscribe(downFlow);
+            public void subscribe(final Downstream<T> downstream) {
+                source.subscribe(new Downstream<T>() {
+                    @Override
+                    public void onNext(T t) {
+                        downstream.onNext(t);
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
             }
         };
     }
