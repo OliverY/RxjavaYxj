@@ -14,6 +14,7 @@ import com.yxj.rxjavayxj.rxjava.Downstream;
 import com.yxj.rxjavayxj.rxjava.Function;
 import com.yxj.rxjavayxj.rxjava.RxEditText;
 import com.yxj.rxjavayxj.rxjava.Upstream;
+import com.yxj.rxjavayxj.test.Rxtest;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -73,23 +74,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void simple() {
-        Upstream.createUpstream(new Upstream<String>() {
-            @Override
-            public void subscribe(Downstream<String> downstream) {
-                downstream.onNext("hello");
-            }
-        })
-        .subscribe(new Downstream<String>() {
-            @Override
-            public void onNext(String s) {
-                Log.e(TAG, s);
-            }
 
-            @Override
-            public void onComplete() {
+        Rxtest retest = new Rxtest();
+        retest.init();
 
-            }
-        });
+//        Upstream.createUpstream(new Upstream<String>() {
+//            @Override
+//            public void subscribe(Downstream<String> downstream) {
+//                downstream.onNext("hello");
+//            }
+//        })
+//        .subscribe(new Downstream<String>() {
+//            @Override
+//            public void onNext(String s) {
+//                Log.e(TAG, s);
+//            }
+//
+//            @Override
+//            public void onComplete() {
+//
+//            }
+//        });
     }
 
     /**
