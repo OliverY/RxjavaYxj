@@ -1,13 +1,18 @@
 package com.yxj.rxjavayxj;
 
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 
 import com.yxj.rxjavayxj.api.Api;
 import com.yxj.rxjavayxj.rxjava.Downstream;
 import com.yxj.rxjavayxj.rxjava.Function;
+import com.yxj.rxjavayxj.rxjava.RxEditText;
 import com.yxj.rxjavayxj.rxjava.Upstream;
 
 public class MainActivity extends AppCompatActivity {
@@ -56,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        EditText et = findViewById(R.id.et);
+        addEditTextWatcher(et);
     }
 
     private void simple() {
@@ -224,6 +231,29 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onNext(String s) {
                         Log.e(TAG,s);
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private void addEditTextWatcher(final EditText editText){
+        RxEditText.textChanges(editText)
+                .subscribeOnNewThread()
+                .observeOnMainThread()
+                .map(new Function<String, Boolean>() {
+                    @Override
+                    public Boolean apply(String s) throws Exception {
+                        return s.length()>6;
+                    }
+                })
+                .subscribe(new Downstream<Boolean>() {
+                    @Override
+                    public void onNext(Boolean aBoolean) {
+                        editText.setTextColor(aBoolean? Color.RED:Color.GREEN);
                     }
 
                     @Override
