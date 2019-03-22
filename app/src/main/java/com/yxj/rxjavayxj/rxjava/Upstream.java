@@ -72,6 +72,32 @@ public abstract class Upstream<T>{
         };
     }
 
+    public <R> Upstream<R> flatMap(final Function<T,Upstream<R>> function){
+
+        return new Upstream<R>() {
+            @Override
+            public void subscribe(final Downstream<R> downstream) {
+                Upstream.this.subscribe(new Downstream<T>() {
+                    @Override
+                    public void onNext(T t) {
+                        try {
+                            Upstream<R> upstream = function.apply(t);
+                            upstream.subscribe(downstream);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+            }
+        };
+
+    }
+
     /**
      * 改变上游所在的线程
      * @return

@@ -54,6 +54,13 @@ public class MainActivity extends AppCompatActivity {
                 compose();
             }
         });
+        findViewById(R.id.btn_flatmap).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                flatMap();
+            }
+        });
+
         findViewById(R.id.btn_login).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -238,6 +245,38 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 });
+    }
+
+    private void flatMap(){
+        Upstream.createUpstream(new Upstream<String>() {
+            @Override
+            public void subscribe(Downstream<String> downstream) {
+                downstream.onNext("hello");
+                downstream.onNext("world");
+                downstream.onNext("i love you");
+            }
+        }).flatMap(new Function<String, Upstream<Boolean>>() {
+            @Override
+            public Upstream<Boolean> apply(final String s) throws Exception {
+                return new Upstream<Boolean>() {
+                    @Override
+                    public void subscribe(Downstream<Boolean> downstream) {
+                        downstream.onNext(s.length()>5);
+                    }
+                };
+            }
+        })
+        .subscribe(new Downstream<Boolean>() {
+            @Override
+            public void onNext(Boolean aBoolean) {
+                Log.e(TAG, "result:" + aBoolean);
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
     }
 
     private void addEditTextWatcher(final EditText editText){
