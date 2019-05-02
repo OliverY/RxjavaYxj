@@ -1,9 +1,9 @@
 package com.yxj.rxjavayxj.api;
 
-import android.database.Observable;
-
-import com.yxj.rxjavayxj.rxjava.Downstream;
-import com.yxj.rxjavayxj.rxjava.Upstream;
+import com.yxj.rxjavayxj.myrxjava.Downstream;
+import com.yxj.rxjavayxj.myrxjava.Upstream;
+import com.yxj.rxjavayxj.rxjava.Observable;
+import com.yxj.rxjavayxj.rxjava.Observer;
 
 /**
  * Author:  Yxj
@@ -45,19 +45,26 @@ public class Api {
      * @param password
      * @return
      */
-    public static Upstream<String> login(String userName, String password){
-        return Upstream.createUpstream(new Upstream<String>() {
+    public static Observable<String> login(String userName, String password){
+        return Observable.create(new Observable<String>() {
                     @Override
-                    public void subscribe(Downstream<String> downstream) {
+                    public void subscribe(Observer<String> observer) {
                         try {
+                            /*
+                            模拟网络访问
+                            这里你可以把sleep替换成 okhttp、httpclient的网络访问
+                            在获得结果时调用observer.onNext()
+                            把结果放入onNext当中
+                             */
+
                             Thread.sleep(3000);
-                            downstream.onNext("登录成功");
+                            observer.onNext("登录成功");
                         } catch (InterruptedException e) {
                             e.printStackTrace();
-                            //downstream.onError(new Exception("登录失败"));
+                            //observer.onError(new Exception("登录失败"));
                         }
                     }
-                }).compose();
+                });
     }
 
 

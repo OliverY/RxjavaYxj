@@ -1,20 +1,17 @@
 package com.yxj.rxjavayxj;
 
 import android.graphics.Color;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
 import com.yxj.rxjavayxj.api.Api;
-import com.yxj.rxjavayxj.rxjava.Downstream;
 import com.yxj.rxjavayxj.rxjava.Function;
-import com.yxj.rxjavayxj.rxjava.RxEditText;
-import com.yxj.rxjavayxj.rxjava.Upstream;
-import com.yxj.rxjavayxj.test.Rxtest;
+import com.yxj.rxjavayxj.rxjava.Observable;
+import com.yxj.rxjavayxj.rxjava.Observer;
+import com.yxj.rxjavayxj.rxjava.RxView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,28 +28,34 @@ public class MainActivity extends AppCompatActivity {
                 simple();
             }
         });
+        findViewById(R.id.btn_null_map).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                nullmap();
+            }
+        });
         findViewById(R.id.btn_map).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 map();
             }
         });
-        findViewById(R.id.btn_onobserve).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btn_subscribeon_and_observeon).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                observe();
+                subscribeOnAndObservOn();
             }
         });
-        findViewById(R.id.btn_onsubscribe).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btn_login).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                subscribe();
+                login();
             }
         });
-        findViewById(R.id.btn_compose).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btn_login).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                compose();
+                login();
             }
         });
         findViewById(R.id.btn_flatmap).setOnClickListener(new View.OnClickListener() {
@@ -62,128 +65,111 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.btn_login).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                login();
-            }
-        });
-
         EditText et = findViewById(R.id.et);
         addEditTextWatcher(et);
     }
 
     private void simple() {
-
-        Rxtest retest = new Rxtest();
-        retest.init();
-
-//        Upstream.createUpstream(new Upstream<String>() {
-//            @Override
-//            public void subscribe(Downstream<String> downstream) {
-//                downstream.onNext("hello");
-//            }
-//        })
-//        .subscribe(new Downstream<String>() {
-//            @Override
-//            public void onNext(String s) {
-//                Log.e(TAG, s);
-//            }
-//
-//            @Override
-//            public void onComplete() {
-//
-//            }
-//        });
-    }
-
-    /**
-     * 模拟map操作符
-     */
-    private void map() {
-        Upstream.createUpstream(new Upstream<String>() {
+        Observable.create(new Observable<String>() {
             @Override
-            public void subscribe(Downstream<String> downstream) {
-                downstream.onNext("hello");
-                downstream.onNext("world");
-                downstream.onNext("i love you");
+            public void subscribe(Observer<String> observer) {
+                observer.onNext("hello");
+                observer.onNext("world");
+                observer.onComplete();
             }
         })
-        .map(new Function<String, Boolean>() {
+        .subscribe(new Observer<String>() {
             @Override
-            public Boolean apply(String s) throws Exception {
-                return s.length() > 5;
-            }
-        })
-        .subscribe(new Downstream<Boolean>() {
-            @Override
-            public void onNext(Boolean aBoolean) {
-                Log.e(TAG, "result:" + aBoolean);
+            public void onNext(String s) {
+                Log.e("yxj",s);
             }
 
             @Override
             public void onComplete() {
+                Log.e("yxj","onComplete");
+            }
+        });
+    }
 
+    /**
+     * 空map 操作符
+     */
+    private void nullmap() {
+        Observable.create(new Observable<String>() {
+            @Override
+            public void subscribe(Observer<String> observer) {
+                observer.onNext("hello");
+                observer.onNext("world");
+                observer.onComplete();
+            }
+        })
+        .map()
+        .subscribe(new Observer<String>() {
+            @Override
+            public void onNext(String s) {
+                Log.e("yxj",s);
+            }
+
+            @Override
+            public void onComplete() {
+                Log.e("yxj","onComplete");
             }
         });
 
     }
 
     /**
-     * 模拟observeOn操作符
+     * map操作符
      */
-    private void observe() {
-        Upstream.createUpstream(new Upstream<String>() {
+    private void map(){
+        Observable.create(new Observable<String>() {
             @Override
-            public void subscribe(Downstream<String> downstream) {
-                downstream.onNext("hello");
-                downstream.onNext("world");
-                downstream.onNext("i love you");
+            public void subscribe(Observer<String> observer) {
+                observer.onNext("hello");
+                observer.onNext("world");
+                observer.onComplete();
             }
         })
-        .map(new Function<String, Boolean>() {
+        .map(new Function<String, Integer>() {
             @Override
-            public Boolean apply(String s) throws Exception {
-                return s.length() > 5;
+            public Integer apply(String s) {
+                return s.length();
             }
         })
-        .observeOnMainThread() // 相当于 observeOn(AndroidThread.mainThread())
-        .subscribe(new Downstream<Boolean>() {
+        .subscribe(new Observer<Integer>() {
             @Override
-            public void onNext(Boolean aBoolean) {
-                Log.e(TAG, "result:" + aBoolean);
+            public void onNext(Integer i) {
+                Log.e("yxj","i:"+i);
             }
 
             @Override
             public void onComplete() {
-
+                Log.e("yxj","onComplete");
             }
         });
-
     }
 
     /**
-     * 模拟subscribeOn操作符
+     * 模拟subscribeOn、ObservOn操作符
      */
-    private void subscribe() {
-        Upstream.createUpstream(new Upstream<String>() {
+    private void subscribeOnAndObservOn() {
+        Observable.create(new Observable<String>() {
             @Override
-            public void subscribe(Downstream<String> downstream) {
-                downstream.onNext("hello world");
-                downstream.onNext("good boy");
-                downstream.onNext("see u");
-                downstream.onComplete();
+            public void subscribe(Observer<String> observer) {
+                observer.onNext("hello");
+                observer.onNext("world");
+                observer.onNext("i love you");
             }
-
         })
+        .subscribeOn()
+        .observeOn()
         .map(new Function<String, Boolean>() {
             @Override
-            public Boolean apply(String s) throws Exception {
-                return s.length() > 6;
+            public Boolean apply(String s) {
+                return s.length() > 5;
             }
         })
-        .observeOnMainThread() // 相当于 observeOn(AndroidThread.mainThread())
-        .subscribe(new Downstream<Boolean>() {
+        .subscribe(new Observer<Boolean>() {
             @Override
             public void onNext(Boolean aBoolean) {
                 Log.e(TAG, "result:" + aBoolean);
@@ -194,41 +180,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, "onComplete");
             }
         });
-    }
 
-    /**
-     * 模拟compose操作符
-     */
-    private void compose() {
-
-        Upstream.createUpstream(new Upstream<String>() {
-            @Override
-            public void subscribe(Downstream<String> downstream) {
-                downstream.onNext("hello world");
-                downstream.onNext("good boy");
-                downstream.onNext("see u");
-                downstream.onComplete();
-            }
-
-        })
-        .map(new Function<String, Boolean>() {
-            @Override
-            public Boolean apply(String s) throws Exception {
-                return s.length() > 6;
-            }
-        })
-        .compose()
-        .subscribe(new Downstream<Boolean>() {
-            @Override
-            public void onNext(Boolean aBoolean) {
-                Log.e(TAG, "result:" + aBoolean);
-            }
-
-            @Override
-            public void onComplete() {
-                Log.e(TAG, "onComplete");
-            }
-        });
     }
 
     /**
@@ -239,7 +191,9 @@ public class MainActivity extends AppCompatActivity {
         String password = "123456";
 
         Api.login(userName,password)
-                .subscribe(new Downstream<String>() {
+                .subscribeOn()// 上游切换到子线程
+                .observeOn() // 下游切换到主线程
+                .subscribe(new Observer<String>() {
                     @Override
                     public void onNext(String s) {
                         Log.e(TAG,s);
@@ -247,54 +201,55 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onComplete() {
-
+                        Log.e(TAG, "onComplete");
                     }
                 });
     }
 
+    /**
+     * 模拟简版的flatMap
+     */
     private void flatMap(){
-        Upstream.createUpstream(new Upstream<String>() {
-            @Override
-            public void subscribe(Downstream<String> downstream) {
-                downstream.onNext("hello");
-                downstream.onNext("world");
-                downstream.onNext("i love you");
-            }
-        }).flatMap(new Function<String, Upstream<Boolean>>() {
-            @Override
-            public Upstream<Boolean> apply(final String s) throws Exception {
-                return new Upstream<Boolean>() {
+        final String userName = "yxj";
+        String password = "123456";
+        Api.login(userName,password)
+                .subscribeOn()// 上游切换到子线程
+                .flatMap(new Function<String, Observable<String>>() {
                     @Override
-                    public void subscribe(Downstream<Boolean> downstream) {
-                        downstream.onNext(s.length()>5);
-                    }
-                };
-            }
-        })
-        .subscribe(new Downstream<Boolean>() {
-            @Override
-            public void onNext(Boolean aBoolean) {
-                Log.e(TAG, "result:" + aBoolean);
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
-        });
-    }
-
-    private void addEditTextWatcher(final EditText editText){
-        RxEditText.textChanges(editText)
-                .subscribeOnNewThread()
-                .observeOnMainThread()
-                .map(new Function<String, Boolean>() {
-                    @Override
-                    public Boolean apply(String s) throws Exception {
-                        return s.length()>6;
+                    public Observable<String> apply(String s) {
+                        String userName2 = "zsh";
+                        String password2 = "123456";
+                        return Api.login(userName2,password2);
                     }
                 })
-                .subscribe(new Downstream<Boolean>() {
+                .observeOn()
+                .subscribe(new Observer<String>() {
+                    @Override
+                    public void onNext(String s) {
+                        Log.e(TAG, "result:" + s);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e(TAG, "onComplete");
+                    }
+                });
+
+    }
+
+    /**
+     * 给edittext添加观察者
+     * @param editText
+     */
+    private void addEditTextWatcher(final EditText editText){
+        RxView.textChanges(editText)
+                .map(new Function<String, Boolean>() {
+                    @Override
+                    public Boolean apply(String s) {
+                        return s.length()>4;
+                    }
+                })
+                .subscribe(new Observer<Boolean>() {
                     @Override
                     public void onNext(Boolean aBoolean) {
                         editText.setTextColor(aBoolean? Color.RED:Color.GREEN);

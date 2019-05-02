@@ -2,13 +2,12 @@ package com.yxj.rxjavayxj.rxjava;
 
 /**
  * Author:  Yxj
- * Time:    2019/3/15 上午9:50
+ * Time:    2019/4/30 上午9:21
  * -----------------------------------------
- * Description: 下游处理 相当于Observer
+ * Description:
  */
-public interface Downstream<T> {
+public interface Observer<T> {
 
     void onNext(T t);
     void onComplete();
-
 }

@@ -8,6 +8,6 @@ package com.yxj.rxjavayxj.rxjava;
  */
 public interface Function<T,R> {
 
-    R apply(T t) throws Exception;
+    R apply(T t);
 
 }

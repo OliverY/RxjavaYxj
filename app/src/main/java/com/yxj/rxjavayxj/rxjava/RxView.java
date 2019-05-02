@@ -6,16 +6,16 @@ import android.widget.EditText;
 
 /**
  * Author:  Yxj
- * Time:    2019/3/22 上午11:37
+ * Time:    2019/5/2 下午9:12
  * -----------------------------------------
  * Description:
  */
-public class RxEditText {
+public class RxView {
 
-    public static Upstream<String> textChanges(final EditText editText){
-        return Upstream.createUpstream(new Upstream<String>() {
+    public static Observable<String> textChanges(final EditText editText){
+        return Observable.create(new Observable<String>() {
             @Override
-            public void subscribe(final Downstream<String> downstream) {
+            public void subscribe(final Observer<String> observer) {
                 editText.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -29,7 +29,7 @@ public class RxEditText {
 
                     @Override
                     public void afterTextChanged(Editable s) {
-                        downstream.onNext(s.toString());
+                        observer.onNext(s.toString());
                     }
                 });
             }

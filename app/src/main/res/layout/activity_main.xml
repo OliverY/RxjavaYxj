@@ -14,31 +14,31 @@
         android:text="simple" />
 
     <Button
+        android:id="@+id/btn_null_map"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="null_map" />
+
+    <Button
         android:id="@+id/btn_map"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="map" />
 
     <Button
-        android:id="@+id/btn_onobserve"
+        android:id="@+id/btn_subscribeon_and_observeon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="onObserve" />
-
-    <Button
-        android:id="@+id/btn_onsubscribe"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="onSubscribe" />
-
-    <Button
-        android:id="@+id/btn_compose"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="compose" />
+        android:text="subscribeOn and observeOn" />
 
     <Button
         android:id="@+id/btn_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="login" />
+
+    <Button
+        android:id="@+id/btn_flatmap"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="login" />
@@ -47,12 +47,6 @@
         android:id="@+id/et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-
-    <Button
-        android:id="@+id/btn_flatmap"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="flatmap" />
 
 
 </LinearLayout>
