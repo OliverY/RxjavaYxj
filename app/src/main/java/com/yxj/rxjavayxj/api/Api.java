@@ -1,7 +1,5 @@
 package com.yxj.rxjavayxj.api;
 
-import com.yxj.rxjavayxj.myrxjava.Downstream;
-import com.yxj.rxjavayxj.myrxjava.Upstream;
 import com.yxj.rxjavayxj.rxjava.Observable;
 import com.yxj.rxjavayxj.rxjava.Observer;
 
