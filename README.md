@@ -1,5 +1,5 @@
 # RxjavaYxj
-thinking in Rxjava
+目标是让看过这篇文章的同学都会写Rxjava核心源码，能看懂Rxjava源码
 
 > 本文适合已经使用过Rxjava，但不知其所以然的同学。你将了解到支撑Rxjava运行最核心的代码。本文手写了一个Rxjava，剔除了Rxjava源码中的各种抽象封装之后，使得核心代码极其简单明了。几乎不用担心看不懂，总共代码不超过50行，还有个小故事模型帮助你理解代码的运行过程。同时非常建议新开一个工程，复制其中的代码，自己打上相应的断点跑一跑，即可明白Rxjava是怎么一回事。源码之下无秘密。[项目源码](https://github.com/OliverY/RxjavaYxj)
 
