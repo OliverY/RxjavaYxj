@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
                 observer.onComplete();
             }
         })
-        .map()
+        .nullMap()
         .subscribe(new Observer<String>() {
             @Override
             public void onNext(String s) {

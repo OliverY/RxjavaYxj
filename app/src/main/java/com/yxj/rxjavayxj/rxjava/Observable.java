@@ -19,7 +19,7 @@ public abstract class Observable<T> {
     }
 
     // 无注释版
-    public Observable<T> map() {
+    public Observable<T> nullMap() {
 
         return new Observable<T>() {
             @Override
