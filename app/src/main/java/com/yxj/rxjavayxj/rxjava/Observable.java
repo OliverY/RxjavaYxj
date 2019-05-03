@@ -82,17 +82,17 @@ public abstract class Observable<T> {
 
         return new Observable<R>() {
             @Override
-            public void subscribe(final Observer<R> observer1) {
+            public void subscribe(final Observer<R> observer) {
                 Observable.this.subscribe(new Observer<T>() {
                     @Override
                     public void onNext(T t) {
                         R r = function.apply(t);
-                        observer1.onNext(r);
+                        observer.onNext(r);
                     }
 
                     @Override
                     public void onComplete() {
-                        observer1.onComplete();
+                        observer.onComplete();
                     }
                 });
             }
