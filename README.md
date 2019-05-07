@@ -1,16 +1,19 @@
-> 9行代码诠释Rxjava运行原理。
+> 9行代码诠释Rxjava基本运行原理。
 
 你是不是看过了很多分析Rxjava源码的文章，但依旧无法在心中勾勒出Rxjava原理的样貌。是什么让我们阅读Rxjava源码变得如此艰难？是Rxjava的代码封装。本文我把Rxjava的各种封装、抽象统统剥去，让最纯粹的Rxjava就赤裸裸的站在你面前，让你想不要都难。
 
-本文与其它Rxjava源码分析文章最大的不同之处在于，不是拿着源码来分析，而是自己根据Rxjava源码思想，重新写一套极简版本的Rxjava实现，所以以下代码只是和Rxjava的api命名相同，但都是自己手写的代码。其中最关键的是理解“事件变换的9行代码”，弄清楚这9行代码，Rxjava原理就变得清晰可见，看Rxjava也会胸有成竹。
+本文与其它Rxjava源码分析文章最大的不同之处在于，不是拿着源码来分析，而是自己根据Rxjava源码思想，重新写一套极简版本的Rxjava实现。其中最关键的是理解“事件变换的9行代码”，弄清楚这9行代码，再看Rxjava源码会更加胸有成竹。
 
+###### 注意：本文是Rxjava的极简版本，只实现了onNext方法的变换调用基本原理，目的是为了方便理解Rxjava源码。本文暂时不涉及线程间的通信问题。
+
+[掘金](https://juejin.im/post/5cce6fb05188254177317fdc)
 [简书](https://www.jianshu.com/p/ba1835f65f89)
 
 ---
 
 #### 本文目录：
 1. 手写Rxjava核心代码，create，nullMap（核心）操作符
-2. map，observeOn，subscribeOn，flatMap操作符
+2. 一分钟看懂map，observeOn，subscribeOn，flatMap操作符
 3. 响应式编程的思想
 
 ---
@@ -172,7 +175,7 @@ public Observable<T> nullMap() {
 #### 图文详细解说nullMap整体调用过程
 
 ##### 第一阶段
-![part_1.png](https://upload-images.jianshu.io/upload_images/1538674-b96b9155fc5443b1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![part_1.png](https://user-gold-cdn.xitu.io/2019/5/7/16a8f3fd330849da?w=888&h=776&f=png&s=107129)
 
 
 
@@ -181,12 +184,12 @@ public Observable<T> nullMap() {
 
 1. 节点A调用map方法，在内部创建了一个新的节点B
 
-###### 这一阶段：主要就是节点与节点之间做连接，之间有各种“如果”（回调）的承诺。节点B这时候对节点A做了个承诺：**“如果”**我有处理者Observer C，那我就内部new一个 Observer B给你（节点A）用”。节点B中的操作者Observer B内部做了与Observer C的衔接工作
+###### 这一阶段：主要就是节点与节点之间做连接，之间有各种“如果”（回调）的承诺。节点B这时候对节点A做了个承诺：“如果”我有处理者Observer C，那我就内部new一个 Observer B给你（节点A）用”。节点B中的操作者Observer B内部做了与Observer C的衔接工作
 
 
 ##### 第二阶段：逆向subscribe
 
-![part_2.png](https://upload-images.jianshu.io/upload_images/1538674-374023ccf949ae62.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![part_2.png](https://user-gold-cdn.xitu.io/2019/5/7/16a8f3fd332b2028?w=1184&h=767&f=png&s=171619)
 
 这一阶段是subscribe方法被调用，传入了最终的Observer。图中步骤2、3
 
@@ -197,7 +200,7 @@ public Observable<T> nullMap() {
 
 ##### 第三阶段：运行业务
 
-![part_3.png](https://upload-images.jianshu.io/upload_images/1538674-6a4a7d8339cec09f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![part_3.png](https://user-gold-cdn.xitu.io/2019/5/7/16a8f3fd333edc04?w=913&h=855&f=png&s=193035)
 
 
 图中步骤4，5
@@ -218,9 +221,9 @@ public Observable<T> nullMap() {
 
 ---
 
-### map，observeOn，subscribeOn，flatMap操作符
+### 一分钟看懂map，observeOn，subscribeOn，flatMap操作符
 
-让我们瞬间搞明白这4个操作符的原理。仅仅是在nullMap中添加了几行代码而已。
+接下来让我们一分钟看懂这4个操作符。因为仅仅是在nullMap中添加了几行代码而已。
 [操作符源码](https://github.com/OliverY/RxjavaYxj/blob/master/app/src/main/java/com/yxj/rxjavayxj/rxjava/Observable.java)
 
 #### map操作符
@@ -265,7 +268,7 @@ public Observable<T> observeOn() {
                 Observable.this.subscribe(new Observer<T>() {
                     @Override
                     public void onNext(final T t) {
-							//模拟切换到主线程（通常上个节点是运行在子线程的情况）
+	        	//模拟切换到主线程（通常上个节点是运行在子线程的情况）
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
@@ -276,7 +279,7 @@ public Observable<T> observeOn() {
 
                     @Override
                     public void onComplete() {
-                        observer.onComplete();
+                        
                     }
                 });
             }
@@ -284,7 +287,9 @@ public Observable<T> observeOn() {
     }
 ```
 
-与“nullMap”相比，修改了最内部的onNext方法执行所在的线程。Rxjava源码会更加灵活，observerOn方法参数让你可以指定切换到的线程，其实就是传入了一个线程调度器，用于指定observer.onNext()方法要在哪个线程执行。原理是一样的。我这里就简写，直接写了切换到主线程，这你肯定能看明白。
+与“nullMap”相比，修改了最内部的onNext方法执行所在的线程。Rxjava源码会更加灵活，observerOn方法参数让你可以指定切换到的线程，其实就是传入了一个线程调度器，用于指定observer.onNext()方法要在哪个线程执行。基本原理是一样的。我这里就简写，直接写了切换到主线程，这你肯定能看明白。
+
+###### 注意：Rxjava源码中obServerOn这个操作符会更加复杂，会需要考虑到onComplete()在所有当前节点的onNext调用结束后猜被调用，需要考虑线程间通信问题。本文为了先简单理解，暂且忽略此问题。
 
 #### subscribeOn操作符
 ```
@@ -306,7 +311,7 @@ public Observable<T> subscribeOn() {
         };
     }
 ```
-将上一个节点切换到新的线程，修改了Observable.this.subscribe()运行的线程，Observable.this指的是调用subscribeOn()的Observable，即上一个节点。因此subscribeOn操作符修改了上一个节点的运行所在的线程
+将上一个节点切换到新的线程，修改了Observable.this.subscribe()运行的线程，Observable.this指的是调用subscribeOn()的Observable，即上一个节点。因此subscribeOn操作符修改了上一个节点的运行所在的线程。
 
 #### flatMap操作符
 ```
@@ -343,7 +348,7 @@ public <R> Observable<R> flatMap(final Function<T, Observable<R>> function) {
 Observable是一个节点，既可以用来封装异步操作，也可以用来封装同步操作（封装同步操作 == map操作符）。所以这样就可以很方便的写出一个
 耗时1操作 —> 耗时2操作 —> 耗时3操作...的操作
 
-##### 是不是很简单，弄懂nullMap的9行代码，剩下的都是在nullMap中修改而来的。理解nullMap，自己也可以写一个Rxjava，然后再去重新看Rxjava源码，你会发现源码会变得如此清晰。原来Rxjava看似层层叠叠的源码最主要讲的就是这个。
+##### 是不是很简单，弄懂nullMap的9行代码，剩下的都是在nullMap中修改而来的。到这里我想说的是，其实Rxjava远比这个复杂，这篇文章只是抛砖引玉，给大家建立一个如何变换的概念，方便大家深入研究Rxjava源码。比如很关键的，线程间通信问题，本文并未提及。但是你有了本文的变换概念，再去看Rxjava源码会事半功倍。
 
 ---
 
@@ -355,8 +360,9 @@ Observable是一个节点，既可以用来封装异步操作，也可以用来�
 
 > 因为异步，我们的业务逻辑会写成回调嵌套的形式，导致过一段时间看自己代码看不懂，语义化不强，不是按着顺序一个节点一个节点的往下执行的。
 >
-> **Rxjava（RxDart也是、ReactiveX应该都是这种思想）将所有的业务操作变成一步一步，每一步不管你是同步、异步，统统用一个节点包裹起来，节点与节点之间是同步调用的关系。如此，整个代码的节点都是按顺序执行的。**
->
-> 所以代码看起来语义性非常强
+> **Rxjava将所有的业务操作变成一步一步，每一步不管你是同步、异步，统统用一个节点包裹起来，节点与节点之间是同步调用的关系。如此，整个代码的节点都是按顺序执行的。**
 
-##### 限于笔者能力有限，不足之处在所难免，恳请各位同学批评指正，以求实现新的提升
+
+
+
+##### 限于作者个人水平有限，本文部分表述难免有不对之处，请留言指出，相互交流。
