@@ -1,10 +1,8 @@
 > 9行代码诠释Rxjava基本运行原理。
 
-你是不是看过了很多分析Rxjava源码的文章，但依旧无法在心中勾勒出Rxjava原理的样貌。是什么让我们阅读Rxjava源码变得如此艰难？是Rxjava的代码封装。本文我把Rxjava的各种封装、抽象统统剥去，让最纯粹的Rxjava就赤裸裸的站在你面前，让你想不要都难。
+你是不是看过了很多分析Rxjava源码的文章，但依旧无法在心中勾勒出Rxjava原理的样貌。是什么让我们阅读Rxjava源码变得如此艰难？是Rxjava的代码封装，以及各种细节问题的解决。本文我把Rxjava的各种封装、抽象统统剥去，只专注于**基本的事件变换**。在理解了事件变换大概是做了件什么事情时，再去看源码，考虑一些其它问题就会更加容易。
 
-本文与其它Rxjava源码分析文章最大的不同之处在于，不是拿着源码来分析，而是自己根据Rxjava源码思想，重新写一套极简版本的Rxjava实现。其中最关键的是理解“事件变换的9行代码”，弄清楚这9行代码，再看Rxjava源码会更加胸有成竹。
-
-###### 注意：本文是Rxjava的极简版本，只实现了onNext方法的变换调用基本原理，目的是为了方便理解Rxjava源码。本文暂时不涉及线程间的通信问题。
+###### 说明：这是一篇Rxjava源码分析的入门文章。旨在让读者脑中有个概念Rxjava最主要干了件什么事情，几个常用操作符的主要原理。今后再去看其它源码分析文章或源码能够更容易理解。因此本文先不去考虑Rxjava源码中复杂的抽象封装，线程间通信，onComplete、onError、dispose等方法，仅专注于“onNext”的最基本调用方式。
 
 [掘金](https://juejin.im/post/5cce6fb05188254177317fdc)
 [简书](https://www.jianshu.com/p/ba1835f65f89)
@@ -13,8 +11,8 @@
 
 #### 本文目录：
 1. 手写Rxjava核心代码，create，nullMap（核心）操作符
-2. 一分钟看懂map，observeOn，subscribeOn，flatMap操作符
-3. 响应式编程的思想
+2. map，observeOn，subscribeOn，flatMap操作符
+3. 响应式编程思想的理解
 
 ---
 ### 手写Rxjava核心代码，create，nullMap操作符
@@ -73,7 +71,7 @@ Observable调用create方法创建一个自己，重写subscribe方法说：**�
 
 Observable调用了subscribe方法，真的找到了Observer。于是兑现承诺，完成整个调用逻辑。
 
-**这里是“如果”有处理者，需要subscribe方法被调用时，“如果”才成立。这一点很重要，因为Rxjava就是建立在一系列的“如果”（回调）操作上的。**
+**这里是“如果”有处理者，需要subscribe方法被调用时，“如果”才成立。Rxjava就是建立在一系列的“如果”（回调）操作上的。**
 
 #### “nullMap”操作符（核心）
 ```
@@ -120,13 +118,11 @@ nullMap()等价于 下面这段代码
 
 ```
 **"nullMap"操作符在Rxjava源码里并不存在**，是我方便大家理解Rxjava运行机制写出来的。
-因为nullMap操作是一个 **base变换操作符**，map，flatMap，subscribeOn，observeOn操作符都是在nullMap上修改而来。所以Rxjava真正的核心就是nullMap操作符，也就9行代码。
-
-### 9行核心代码
+因为nullMap操作是一个 **base变换操作**，map，flatMap，subscribeOn，observeOn操作符都是在nullMap上修改而来。所以Rxjava的变换的基础就是nullMap操作符。
 
 ```
 Observable.java
-// 这就是Rxjava的核心
+// 这就是Rxjava的变换核心
 
 public Observable<T> nullMap() {
 
@@ -168,9 +164,6 @@ public Observable<T> nullMap() {
 > 
 > **Observable每调用一次操作符，其实就是创建一个新的Observable。新Observable内部通过subscribe方法“逆向的”与上一Observable关联。在新Observable中的new出来的Observer内的onNext方法中做了和下一个Observer之间的关联。**
 >
->注意：
->1. 新Observable与上一个是一样的，有相同的属性和方法
->2. 下一个Observer：可以是下一个Observable中的Observer，或者是程序员调用subscribe方法时传入的Observer
 
 #### 图文详细解说nullMap整体调用过程
 
@@ -221,9 +214,9 @@ public Observable<T> nullMap() {
 
 ---
 
-### 一分钟看懂map，observeOn，subscribeOn，flatMap操作符
+### map，observeOn，subscribeOn，flatMap操作符
 
-接下来让我们一分钟看懂这4个操作符。因为仅仅是在nullMap中添加了几行代码而已。
+接下来让我们看看这4个操作符，仅仅是在nullMap中做了小改动而已。
 [操作符源码](https://github.com/OliverY/RxjavaYxj/blob/master/app/src/main/java/com/yxj/rxjavayxj/rxjava/Observable.java)
 
 #### map操作符
@@ -287,9 +280,7 @@ public Observable<T> observeOn() {
     }
 ```
 
-与“nullMap”相比，修改了最内部的onNext方法执行所在的线程。Rxjava源码会更加灵活，observerOn方法参数让你可以指定切换到的线程，其实就是传入了一个线程调度器，用于指定observer.onNext()方法要在哪个线程执行。基本原理是一样的。我这里就简写，直接写了切换到主线程，这你肯定能看明白。
-
-###### 注意：Rxjava源码中obServerOn这个操作符会更加复杂，会需要考虑到onComplete()在所有当前节点的onNext调用结束后猜被调用，需要考虑线程间通信问题。本文为了先简单理解，暂且忽略此问题。
+与“nullMap”相比，修改了最内部的onNext方法执行所在的线程。Rxjava源码会更加灵活，observerOn方法参数让你可以指定切换到的线程，其实就是传入了一个线程调度器，用于指定observer.onNext()方法要在哪个线程执行。原理是一样的。我这里就简写，直接写了切换到主线程，这你肯定能看明白。
 
 #### subscribeOn操作符
 ```
@@ -311,7 +302,7 @@ public Observable<T> subscribeOn() {
         };
     }
 ```
-将上一个节点切换到新的线程，修改了Observable.this.subscribe()运行的线程，Observable.this指的是调用subscribeOn()的Observable，即上一个节点。因此subscribeOn操作符修改了上一个节点的运行所在的线程。
+将上一个节点切换到新的线程，修改了Observable.this.subscribe()运行的线程，Observable.this指的是调用subscribeOn()的Observable，即上一个节点。因此subscribeOn操作符修改了上一个节点的运行所在的线程
 
 #### flatMap操作符
 ```
@@ -343,13 +334,12 @@ public <R> Observable<R> flatMap(final Function<T, Observable<R>> function) {
 ```
 
 
-其实flatmap和map极为相似，只不过function.apply()的返回值是一个Observable。
+flatmap和map极为相似，只不过function.apply()的返回值是一个Observable。
 
 Observable是一个节点，既可以用来封装异步操作，也可以用来封装同步操作（封装同步操作 == map操作符）。所以这样就可以很方便的写出一个
 耗时1操作 —> 耗时2操作 —> 耗时3操作...的操作
 
-##### 是不是很简单，弄懂nullMap的9行代码，剩下的都是在nullMap中修改而来的。到这里我想说的是，其实Rxjava远比这个复杂，这篇文章只是抛砖引玉，给大家建立一个如何变换的概念，方便大家深入研究Rxjava源码。比如很关键的，线程间通信问题，本文并未提及。但是你有了本文的变换概念，再去看Rxjava源码会事半功倍。
-
+##### 到这里相信大家已经对Rxjava怎样运行，几个常见的操作符内部基本原理有了初步的理解，本文的目的就已经达到了。在之后看Rxjava源码或者其它分析文章时，就能少受各种变换的干扰。接下来就可以思考Rxjava是如何对各个Observable做封装，线程之间如何通信，onComplete、onError、dispose等方法如何实现了。
 ---
 
 ### 响应式编程的思想
