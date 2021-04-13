@@ -1,6 +1,7 @@
 package com.yxj.rxjavayxj.rxjava;
 
 import android.os.Handler;
+import android.os.Looper;
 
 import java.util.Iterator;
 
@@ -224,6 +225,6 @@ public abstract class Observable<T> {
 
     }
 
-    Handler handler = new Handler();
+    Handler handler = new Handler(Looper.getMainLooper());
 
 }
